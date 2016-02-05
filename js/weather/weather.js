@@ -31,8 +31,7 @@ var weather = {
 	forecastEndpoint: 'forecast/daily',
 	updateInterval: config.weather.interval || 6000,
 	fadeInterval: config.weather.fadeInterval || 1000,
-	intervalId: null,
-	orientation: config.weather.orientation || 'vertical',
+	intervalId: null
 }
 
 /**
@@ -41,7 +40,7 @@ var weather = {
  * @return {float}             The new floating point value
  */
 weather.roundValue = function (temperature) {
-	return parseFloat(temperature).toFixed(1);
+	return parseFloat(temperature).toFixed(0);
 }
 
 /**
@@ -51,6 +50,9 @@ weather.roundValue = function (temperature) {
  * @return {int}     The wind speed converted into its corresponding Beaufort number
  */
 weather.ms2Beaufort = function(ms) {
+	// Defaults to mph when in imperial
+	return ms;
+	return weather.msToMPH(ms);
 	var kmh = ms * 60 * 60 / 1000;
 	var speeds = [1, 5, 11, 19, 28, 38, 49, 61, 74, 88, 102, 117, 1000];
 	for (var beaufort in speeds) {
@@ -62,6 +64,11 @@ weather.ms2Beaufort = function(ms) {
 	return 12;
 }
 
+weather.msToMPH = function(ms)
+ {
+ 	var mph = (ms / 1000) * 0.621371;
+ 	return mph;
+ }
 /**
  * Retrieves the current temperature and weather patter from the OpenWeatherMap API
  */
@@ -90,14 +97,14 @@ weather.updateCurrentWeather = function () {
 				_sunrise = moment(data.sys.sunrise*1000).format('HH:mm'),
 				_sunset = moment(data.sys.sunset*1000).format('HH:mm');
 
-			var _newWindHtml = '<span class="wind"><span class="wi wi-strong-wind xdimmed"></span> ' + this.ms2Beaufort(_wind) + '</span>',
-				_newSunHtml = '<span class="sun"><span class="wi wi-sunrise xdimmed"></span> ' + _sunrise + '</span>';
+			var _newWindHtml = '<span class="wi wi-strong-wind xdimmed"></span> ' + this.ms2Beaufort(_wind),
+				_newSunHtml = '<span class="wi wi-sunrise xdimmed"></span> ' + _sunrise;
 
 			if (_sunrise < _now && _sunset > _now) {
-				_newSunHtml = '<span class="sun"><span class="wi wi-sunset xdimmed"></span> ' + _sunset + '</span>';
+				_newSunHtml = '<span class="wi wi-sunset xdimmed"></span> ' + _sunset;
 			}
 
-			$(this.windSunLocation).updateWithText(_newWindHtml + ' ' + _newSunHtml,this.fadeInterval);
+			$(this.windSunLocation).updateWithText(_newWindHtml + ' ' + _newSunHtml, this.fadeInterval);
 
 		}.bind(this),
 		error: function () {
@@ -119,44 +126,28 @@ weather.updateWeatherForecast = function () {
 		success: function (data) {
 
 			var _opacity = 1,
-				_forecastHtml = '<tr>',
-				_forecastHtml2 = '<tr>',
-				_forecastHtml3 = '<tr>',
-				_forecastHtml4 = '<tr>';
+				_forecastHtml = '';
 
-			_forecastHtml = '<table class="forecast-table"><tr>';
+			_forecastHtml += '<table class="forecast-table">';
 
 			for (var i = 0, count = data.list.length; i < count; i++) {
 
 				var _forecast = data.list[i];
-				
-				if (this.orientation == 'vertical') {
-					_forecastHtml2 = '';
-					_forecastHtml3 = '';
-					_forecastHtml4 = '';
-				}
 
-				_forecastHtml += '<td style="opacity:' + _opacity + '" class="day">' + moment(_forecast.dt, 'X').format('ddd') + '</td>';
-				_forecastHtml2 += '<td style="opacity:' + _opacity + '" class="icon-small ' + this.iconTable[_forecast.weather[0].icon] + '"></td>';
-				_forecastHtml3 += '<td style="opacity:' + _opacity + '" class="temp-max">' + this.roundValue(_forecast.temp.max) + '</td>';
-				_forecastHtml4 += '<td style="opacity:' + _opacity + '" class="temp-min">' + this.roundValue(_forecast.temp.min) + '</td>';
+				_forecastHtml += '<tr style="opacity:' + _opacity + '">';
+
+				_forecastHtml += '<td class="day">' + moment(_forecast.dt, 'X').format('ddd') + '</td>';
+				_forecastHtml += '<td class="icon-small ' + this.iconTable[_forecast.weather[0].icon] + '"></td>';
+				_forecastHtml += '<td class="temp-max">' + this.roundValue(_forecast.temp.max) + '</td>';
+				_forecastHtml += '<td class="temp-min">' + this.roundValue(_forecast.temp.min) + '</td>';
+
+				_forecastHtml += '</tr>';
 
 				_opacity -= 0.155;
 
-				if (this.orientation == 'vertical') {
-					_forecastHtml += _forecastHtml2 + _forecastHtml3 + _forecastHtml4 + '</tr>';
-				}
 			}
-			_forecastHtml  += '</tr>',
-			_forecastHtml2 += '</tr>',
-			_forecastHtml3 += '</tr>',
-			_forecastHtml4 += '</tr>';
-			
-			if (this.orientation == 'vertical') {
-				_forecastHtml += '</table>';
-			} else {
-				_forecastHtml += _forecastHtml2 + _forecastHtml3 + _forecastHtml4 +'</table>';
-			}
+
+			_forecastHtml += '</table>';
 
 			$(this.forecastLocation).updateWithText(_forecastHtml, this.fadeInterval);
 
@@ -175,13 +166,12 @@ weather.init = function () {
 	}
 
 	if (this.params.cnt === undefined) {
-		this.params.cnt = 6;
+		this.params.cnt = 5;
 	}
 
 	this.intervalId = setInterval(function () {
 		this.updateCurrentWeather();
 		this.updateWeatherForecast();
 	}.bind(this), this.updateInterval);
-	this.updateCurrentWeather();
-	this.updateWeatherForecast();
+
 }

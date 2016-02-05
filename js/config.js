@@ -1,19 +1,17 @@
 var config = {
-    lang: 'nl',
+    lang: 'en',
     time: {
-        timeFormat: 12,
-        displaySeconds: true,
-        digitFade: false,
+        timeFormat: 12
     },
     weather: {
         //change weather params here:
         //units: metric or imperial
         params: {
-            q: 'Baarn,Netherlands',
-            units: 'metric',
+            q: 'Austin, Tx',
+            units: 'imperial',
             // if you want a different lang for the weather that what is set above, change it here
-            lang: 'nl',
-            APPID: 'YOUR_FREE_OPENWEATHER_API_KEY'
+            lang: 'en',
+            APPID: '355d5fbcb4dc961be47405fe1936f3c6'
         }
     },
     compliments: {
@@ -36,31 +34,8 @@ var config = {
         ]
     },
     calendar: {
-        maximumEntries: 10, // Total Maximum Entries
-		displaySymbol: true,
-		defaultSymbol: 'calendar', // Fontawsome Symbol see http://fontawesome.io/cheatsheet/
-        urls: [
-		{
-			symbol: 'calendar-plus-o', 
-			url: 'https://p01-calendarws.icloud.com/ca/subscribe/1/n6x7Farxpt7m9S8bHg1TGArSj7J6kanm_2KEoJPL5YIAk3y70FpRo4GyWwO-6QfHSY5mXtHcRGVxYZUf7U3HPDOTG5x0qYnno1Zr_VuKH2M'
-		},
-		{
-			symbol: 'soccer-ball-o',
-			url: 'https://www.google.com/calendar/ical/akvbisn5iha43idv0ktdalnor4%40group.calendar.google.com/public/basic.ics',
-		},
-		// {
-			// symbol: 'mars',
-			// url: "https://server/url/to/his.ics",
-		// },
-		// {
-			// symbol: 'venus',
-			// url: "https://server/url/to/hers.ics",
-		// },
-		// {
-			// symbol: 'venus-mars',
-			// url: "https://server/url/to/theirs.ics",
-		// },
-		]
+        maximumEntries: 10,
+        url: "webcal://p33-calendars.icloud.com/published/2/TNn6Gc7WpIIIRl5twfXr1MECwXukGcCz4Vn4dWJks3dNGygp60fCBpHr7GCVg0GGQEbqLg0drZukBqn5jpT6-M8vn7lfLu6q2DQTcjV_KTM"
     },
     news: {
         feed: 'http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml'
